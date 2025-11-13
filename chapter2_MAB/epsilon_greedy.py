@@ -28,7 +28,7 @@ print("The best arm probability:",bandit_10_arm.best_prob)
 class Solver:
     def __init__(self,bandit):
         self.bandit=bandit
-        self.counts=np.zeros(bandit.K) # number of times each arm is played
+        self.counts=np.zeros(self.bandit.K) # number of times each arm is played
         self.regret=0
         self.actions=[]
         self.regrets=[]
@@ -74,24 +74,24 @@ def plot_results(solvers, solver_names):
     plt.legend()
     plt.show()
 
+def greedy_plot():
+    # Example usage
+    np.random.seed(1)
+    epsilon_greedy_solver = EpsilonGreedy(bandit_10_arm)
+    epsilon_greedy_solver.run(5000)
+    print('epsilon-greedy regret:', epsilon_greedy_solver.regret)
+    plot_results([epsilon_greedy_solver], ["EpsilonGreedy"])
 
-# Example usage
-np.random.seed(1)
-epsilon_greedy_solver = EpsilonGreedy(bandit_10_arm)
-epsilon_greedy_solver.run(5000)
-print('epsilon-greedy regret:', epsilon_greedy_solver.regret)
-plot_results([epsilon_greedy_solver], ["EpsilonGreedy"])
 
+    # Compare different epsilon values
+    np.random.seed(1)
+    epsilons = [1e-4, 0.01, 0.1, 0.25, 0.5]
+    epsilon_greedy_solver_list = [EpsilonGreedy(bandit_10_arm, epsilon=e) for e in epsilons]
+    epsilon_greedy_solver_names = ["epsilon={}".format(e) for e in epsilons]
+    for solver in epsilon_greedy_solver_list:
+        solver.run(5000)
 
-# Compare different epsilon values
-np.random.seed(1)
-epsilons = [1e-4, 0.01, 0.1, 0.25, 0.5]
-epsilon_greedy_solver_list = [EpsilonGreedy(bandit_10_arm, epsilon=e) for e in epsilons]
-epsilon_greedy_solver_names = ["epsilon={}".format(e) for e in epsilons]
-for solver in epsilon_greedy_solver_list:
-    solver.run(5000)
-
-plot_results(epsilon_greedy_solver_list, epsilon_greedy_solver_names)
+    plot_results(epsilon_greedy_solver_list, epsilon_greedy_solver_names)
 
 
 class DecayingEpsilonGreedy(Solver):
@@ -115,9 +115,13 @@ class DecayingEpsilonGreedy(Solver):
         self.estimates[k]=(self.estimates[k]*n + reward)/(n+1)
         return k
 
+def decaying_greedy_plot():
+    np.random.seed(1)
+    decaying_epsilon_greedy_solver = DecayingEpsilonGreedy(bandit_10_arm)
+    decaying_epsilon_greedy_solver.run(5000)
+    print('epsilon 值衰减的贪婪算法的累积懊悔为：', decaying_epsilon_greedy_solver.regret)
+    plot_results([decaying_epsilon_greedy_solver], ["DecayingEpsilonGreedy"])
 
-np.random.seed(1)
-decaying_epsilon_greedy_solver = DecayingEpsilonGreedy(bandit_10_arm)
-decaying_epsilon_greedy_solver.run(5000)
-print('epsilon 值衰减的贪婪算法的累积懊悔为：', decaying_epsilon_greedy_solver.regret)
-plot_results([decaying_epsilon_greedy_solver], ["DecayingEpsilonGreedy"])
+if __name__ == "__main__":
+    greedy_plot()
+    decaying_greedy_plot()
