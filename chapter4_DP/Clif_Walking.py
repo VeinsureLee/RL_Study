@@ -1,8 +1,8 @@
 class CliffWalkingEnv:
     """ 悬崖漫步环境"""
-    def __init__(self, col=12, row=4):
-        self.n_col = col # 定义网格世界的列
-        self.n_row = row # 定义网格世界的行
+    def __init__(self, n_col=12, n_row=4):
+        self.n_col = n_col # 定义网格世界的列
+        self.n_row = n_row # 定义网格世界的行
         # 转移矩阵 P[state][action] = [(p, next_state, reward, done)]包含下一个状态和奖励
         self.P = self.createP()
 
