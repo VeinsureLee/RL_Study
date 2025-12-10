@@ -4,15 +4,15 @@ class ValueIteration:
         self.env = env
         self.theta = theta
         self.gamma = gamma
-        self.v = [0] * self.env.n_col * self.env.n_row
-        self.pi = [None for i in range(self.env.n_col * self.env.n_row)]
+        self.v = [0] * self.env.ncol * self.env.nrow
+        self.pi = [None for i in range(self.env.ncol * self.env.nrow)]
 
     def value_iteration(self):
         cnt = 0
         while True:
             max_diff = 0
-            new_v = [0 for _ in range(self.env.n_col * self.env.n_row)]
-            for s in range(self.env.n_row * self.env.n_col):
+            new_v = [0 for _ in range(self.env.ncol * self.env.nrow)]
+            for s in range(self.env.nrow * self.env.ncol):
                 qsa_list = []
                 for a in range(4):
                     qsa = 0
@@ -30,7 +30,7 @@ class ValueIteration:
         self.get_policy()
 
     def get_policy(self):
-        for s in range(self.env.n_row * self.env.n_col):
+        for s in range(self.env.nrow * self.env.ncol):
             qsa_list = []
             for a in range(4):
                 qsa = 0

@@ -5,8 +5,8 @@ class PolicyIteration:
         self.env = env
         self.theta = theta
         self.gamma = gamma
-        self.v = [0]* self.env.n_col * self.env.n_row  # <1>
-        self.pi = [[0.25,0.25,0.25,0.25] for _ in range(self.env.n_col * self.env.n_row)]  # <2>
+        self.v = [0] * self.env.ncol * self.env.nrow  # <1>
+        self.pi = [[0.25,0.25,0.25,0.25] for _ in range(self.env.ncol * self.env.nrow)]  # <2>
 
         # <1> state value
         # <2> random policy initialization(equal probability for each action)
@@ -16,8 +16,8 @@ class PolicyIteration:
         cnt = 1
         while True:
             max_diff = 0
-            new_v = [0 for _ in range(self.env.n_col * self.env.n_row)]
-            for s in range(self.env.n_row * self.env.n_col):
+            new_v = [0 for _ in range(self.env.ncol * self.env.nrow)]
+            for s in range(self.env.nrow * self.env.ncol):
                 qsa_list = [] # <1>
                 for a in range(4):
                     qsa = 0
@@ -39,7 +39,7 @@ class PolicyIteration:
 
     # tag:: policy_improvement[]
     def policy_improvement(self):
-        for s in range(self.env.n_row * self.env.n_col):
+        for s in range(self.env.nrow * self.env.ncol):
             qsa_list = []
             for a in range(4):
                 qsa = 0
@@ -74,14 +74,14 @@ def print_agent(agent, action_meaning, disaster=None, end=None):
     if disaster is None:
         disaster = []
     print("State Value: ")
-    for i in range(agent.env.n_row):
-        for j in range(agent.env.n_col):
-            print('%6.6s' % ('%.3f' % agent.v[i * agent.env.n_col + j]), end=' ')
+    for i in range(agent.env.nrow):
+        for j in range(agent.env.ncol):
+            print('%6.6s' % ('%.3f' % agent.v[i * agent.env.ncol + j]), end=' ')
         print()
     print("Policy: ")
-    for i in range(agent.env.n_row):
-        for j in range(agent.env.n_col):
-            s = i * agent.env.n_col + j
+    for i in range(agent.env.nrow):
+        for j in range(agent.env.ncol):
+            s = i * agent.env.ncol + j
             if s in disaster:
                 print('****', end=' ')
             elif s in end:
