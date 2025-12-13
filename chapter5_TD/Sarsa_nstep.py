@@ -2,7 +2,7 @@ import numpy as np
 import tqdm
 from matplotlib import pyplot as plt
 
-from chapter5_TD.Sarsa import CliffWalkingEnv
+from chapter5_TD.Sarsa import CliffWalkingEnv, print_agent
 
 
 # tag:: nstep_Sarsa[]
@@ -93,6 +93,11 @@ def main():
     plt.ylabel('Return')
     plt.title(f'n-step Sarsa (n={n_step}) on Cliff Walking')
     plt.show()
+
+    action_meaning = ['^', 'v', '<', '>']
+    print('5 步 Sarsa 算法最终收敛得到的策略为：')
+    print_agent(agent, env, action_meaning, list(range(37, 47)), [47])
+
 
 if __name__ == "__main__":
     main()
