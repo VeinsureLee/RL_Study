@@ -20,12 +20,29 @@ class QLearningAgent_Onpolicy(object):
             action = np.argmax(self.Q_table[state])
         return action
 
-    def best_action(self, state):  # Printing optimal actions
-        Q_max = np.max(self.Q_table[state])
+    import numpy as np
+
+    def best_action(self, state, epsilon=0.1):
+        q_values = self.Q_table[state]
+        Q_max = np.max(q_values)
+        best_action_indices = np.where(q_values == Q_max)[0]
+        non_best_action_indices = np.where(q_values != Q_max)[0]
+
+        action_probs = np.zeros(self.n_actions)
+
+        if len(best_action_indices) > 0:
+            best_prob_per_action = epsilon / len(best_action_indices)
+            action_probs[best_action_indices] = best_prob_per_action
+
+        if len(non_best_action_indices) > 0:
+            non_best_prob_per_action = (1 - epsilon) / len(non_best_action_indices)
+            action_probs[non_best_action_indices] = non_best_prob_per_action
+
+        action_probs = action_probs / np.sum(action_probs)
+        selected_action = np.random.choice(self.n_actions, p=action_probs)
+
         best_actions = [0] * self.n_actions
-        for i in range(self.n_actions):
-            if self.Q_table[state][i] == Q_max:
-                best_actions[i] = 1
+        best_actions[selected_action] = 1
         return best_actions
 
     def update(self, state, action, reward, next_state, done):

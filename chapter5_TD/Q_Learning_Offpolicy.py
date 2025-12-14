@@ -28,12 +28,7 @@ class QLearningAgent_Offpolicy(object):
         self.target_policy[state][best_action] = 1.0
 
     def best_action(self, state):  # Printing optimal actions
-        Q_max = np.max(self.Q_table[state])
-        best_actions = [0] * self.n_actions
-        for i in range(self.n_actions):
-            if self.Q_table[state][i] == Q_max:
-                best_actions[i] = 1
-        return best_actions
+        return self.target_policy[state]
 
     def update(self, state, action, reward, next_state, done):
         target = reward + (0 if done else self.gamma * np.max(self.Q_table[next_state]))
@@ -100,7 +95,7 @@ def main():
     end_state = [3 * 12 + 11]  # end point: row 3, column 11 (index 47)
     print('\nQ Learning OffPolicy 算法最终收敛的策略为：')
     print_agent(agent, env, action_meaning, cliff_states, end_state)
-# Actually, because we only print the best actions, the target and behaviour policies are not distinguished in print_agent.
+
 
 if __name__ == "__main__":
     main()
