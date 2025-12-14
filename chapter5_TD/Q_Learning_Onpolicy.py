@@ -4,8 +4,8 @@ from matplotlib import pyplot as plt
 
 from chapter5_TD.Sarsa import CliffWalkingEnv, print_agent
 
-# tag:: Expectation_Sarsa[]
-class Expectation_Sarsa:
+# tag:: QLearning_Onpolicy[]
+class QLearningAgent_Onpolicy(object):
     def __init__(self, ncol, nrow, epsilon, alpha, gamma, num_actions=4):
         self.Q_table = np.zeros((nrow * ncol, num_actions))
         self.n_actions = num_actions
@@ -29,15 +29,10 @@ class Expectation_Sarsa:
         return best_actions
 
     def update(self, state, action, reward, next_state, done):
-        # Calculate expected value of next state
-        policy_s = np.ones(self.n_actions) * self.epsilon / self.n_actions
-        q_next = self.Q_table[next_state]
-        best_actions = np.where(q_next == np.max(q_next))[0]
-        policy_s[best_actions] += (1 - self.epsilon) / len(best_actions)
-        expected_Q_next = np.dot(q_next, policy_s)
 
-        target = reward + (0 if done else self.gamma * expected_Q_next)
+        target = reward + (0 if done else self.gamma * self.Q_table[next_state].max())
         self.Q_table[state, action] += self.alpha * (target - self.Q_table[state, action])
+# end:: QLearning_Onpolicy[]
 
 def main():
     # Environment parameters: 4 rows, 12 columns (classic cliff walking configuration)
@@ -50,8 +45,8 @@ def main():
     # Sarsa hyperparameters
     epsilon = 0.1  # exploration rate
     alpha = 0.1  # learning rate
-    gamma = 0.9  # discount factor <1>
-    agent = Expectation_Sarsa(ncol, nrow, epsilon, alpha, gamma)
+    gamma = 0.9  # discount factor
+    agent = QLearningAgent_Onpolicy(ncol, nrow, epsilon, alpha, gamma)
     num_episodes = 500  # total training episodes
 
     # Record return for each episode
@@ -61,17 +56,15 @@ def main():
             for i_episode in range(int(num_episodes / 10)):
                 episode_return = 0  # corrected variable name for semantic clarity
                 state = env.reset()
-                action = agent.take_action(state)
                 done = False
 
                 # Single episode interaction
                 while not done:
+                    action = agent.take_action(state)
                     next_state, reward, done = env.step(action)
-                    next_action = agent.take_action(next_state)
-                    episode_return += reward # <2>
+                    episode_return += reward
                     agent.update(state, action, reward, next_state, done)
                     state = next_state
-                    action = next_action
 
                 return_list.append(episode_return)
 
@@ -98,7 +91,7 @@ def main():
     action_meaning = ['^', 'v', '<', '>']  # action symbols
     cliff_states = [36 + j for j in range(1, 11)]  # cliff area: row 3 (index 3), columns 1-10
     end_state = [3 * 12 + 11]  # end point: row 3, column 11 (index 47)
-    print('\nExpected Sarsa 算法最终收敛的策略为：')
+    print('\nQ Learning OnPolicy 算法最终收敛的策略为：')
     print_agent(agent, env, action_meaning, cliff_states, end_state)
 
 if __name__ == "__main__":
