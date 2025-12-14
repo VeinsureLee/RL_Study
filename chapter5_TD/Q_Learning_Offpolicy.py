@@ -64,8 +64,8 @@ def main():
                     action = agent.behaviour_action(state)
                     next_state, reward, done = env.step(action)
                     episode_return += reward
-                    agent.update(state, action, reward, next_state, done)
                     agent.update_target_policy(state)
+                    agent.update(state, action, reward, next_state, done)
                     state = next_state
 
                 return_list.append(episode_return)
