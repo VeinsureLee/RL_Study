@@ -8,7 +8,7 @@ class CliffWalkingEnv:
     def __init__(self, nrow, ncol):
         self.nrow = nrow  # number of rows in the grid
         self.ncol = ncol  # number of columns in the grid
-        self.x = 0  # row coordinate (vertical position)
+        self.x = nrow - 1    # row coordinate (vertical position)
         self.y = 0  # column coordinate (horizontal position), initial position corrected to (0,0) (bottom-left corner)
 
     def step(self, action):  # <1>
@@ -115,7 +115,7 @@ def main():
     # Sarsa hyperparameters
     epsilon = 0.1  # exploration rate
     alpha = 0.1  # learning rate
-    gamma = 0.9  # discount factor
+    gamma = 0.9  # discount factor <1>
     agent = Sarsa(ncol, nrow, epsilon, alpha, gamma)
     num_episodes = 500  # total training episodes
 
@@ -133,7 +133,7 @@ def main():
                 while not done:
                     next_state, reward, done = env.step(action)
                     next_action = agent.take_action(next_state)
-                    episode_return += reward
+                    episode_return += reward # <2>
                     agent.update(state, action, reward, next_state, next_action)
                     state = next_state
                     action = next_action
@@ -147,7 +147,7 @@ def main():
                         'episode': f'{num_episodes / 10 * i + i_episode + 1}',
                         'avg_return': f'{avg_return:.3f}'
                     })
-                    pbar.update(1)
+                pbar.update(1)
 
     # Plot return curve
     plt.figure(figsize=(10, 6))
@@ -166,6 +166,8 @@ def main():
     print('\nSarsa 算法最终收敛的策略为：')
     print_agent(agent, env, action_meaning, cliff_states, end_state)
 
+# <1> Discount factor for future rewards, only used in update formula
+# <2> Accumulate rewards for the episode return, no need to times discount factor here, because we want total return due to negative rewards
 
 if __name__ == '__main__':
     main()
