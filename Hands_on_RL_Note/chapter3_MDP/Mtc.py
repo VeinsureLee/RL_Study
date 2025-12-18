@@ -1,5 +1,4 @@
-import numpy as np
-from chapter3_MDP.MDP import *
+from Hands_on_RL_Note.chapter3_MDP.MDP import *
 
 
 def sample(MDP, Pi, timestep_max, number):

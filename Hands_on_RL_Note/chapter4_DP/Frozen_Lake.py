@@ -1,7 +1,7 @@
 import gymnasium as gym
 
-from chapter4_DP.PI import PolicyIteration, print_agent
-from chapter4_DP.VI import ValueIteration
+from Hands_on_RL_Note.chapter4_DP.PI import PolicyIteration, print_agent
+from Hands_on_RL_Note.chapter4_DP.VI import ValueIteration
 
 env = gym.make("FrozenLake-v1", render_mode="ansi")
 state, info = env.reset()

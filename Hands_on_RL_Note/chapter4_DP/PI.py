@@ -96,7 +96,7 @@ def print_agent(agent, action_meaning, disaster=None, end=None):
 # end:: print_agent[]
 
 def main():
-    from chapter4_DP.Clif_Walking import CliffWalkingEnv
+    from Hands_on_RL_Note.chapter4_DP.Clif_Walking import CliffWalkingEnv
     env = CliffWalkingEnv()
     theta = 1e-3
     gamma = 0.9

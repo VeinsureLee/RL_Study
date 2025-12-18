@@ -2,7 +2,7 @@ import numpy as np
 import tqdm
 from matplotlib import pyplot as plt
 
-from chapter5_TD.Sarsa import CliffWalkingEnv, print_agent
+from Hands_on_RL_Note.chapter5_TD.Sarsa import CliffWalkingEnv, print_agent
 
 
 # tag:: nstep_Sarsa[]

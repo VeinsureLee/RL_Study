@@ -47,8 +47,8 @@ class ValueIteration:
 # end:: ValueIteration[]
 
 def main():
-    from chapter4_DP.Clif_Walking import CliffWalkingEnv
-    from chapter4_DP.PI import print_agent
+    from Hands_on_RL_Note.chapter4_DP.Clif_Walking import CliffWalkingEnv
+    from Hands_on_RL_Note.chapter4_DP.PI import print_agent
     env = CliffWalkingEnv()
     action_meaning = ['^', 'v', '<', '>']
     theta = 0.001
