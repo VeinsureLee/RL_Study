@@ -1,11 +1,9 @@
-__credits__ = ["Intelligent Unmanned Systems Laboratory at Westlake University."]
-
-import sys    
-sys.path.append("..")         
+import sys
+sys.path.append("..")
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches          
-from examples.arguments import args           
+import matplotlib.patches as patches
+from examples.arguments import args
 
 class GridWorld:
     # Initialize the GridWorld environment
@@ -133,8 +131,88 @@ class GridWorld:
         plt.draw()
         plt.pause(animation_interval)
         if args.debug:
-            input('press Enter to continue...')     
+            input('press Enter to continue...')
 
+    def render_static(self, values=None, policy=None, precision=1):
+        """
+        Static rendering for Jupyter / report
+        values : state value array, shape (num_states,)
+        policy : policy matrix, shape (num_states, num_actions)
+        """
+        fig, ax = plt.subplots(figsize=(6, 6))
+
+        # grid
+        ax.set_xlim(-0.5, self.env_size[0] - 0.5)
+        ax.set_ylim(-0.5, self.env_size[1] - 0.5)
+        ax.set_xticks(np.arange(-0.5, self.env_size[0], 1))
+        ax.set_yticks(np.arange(-0.5, self.env_size[1], 1))
+        ax.grid(True, linestyle="-", color="gray", linewidth=1)
+        ax.set_aspect("equal")
+        ax.invert_yaxis()
+        ax.tick_params(bottom=False, left=False, labelbottom=False, labelleft=False)
+
+        # target
+        ax.add_patch(
+            patches.Rectangle(
+                (self.target_state[0] - 0.5, self.target_state[1] - 0.5),
+                1, 1, facecolor=self.color_target
+            )
+        )
+
+        # forbidden
+        for s in self.forbidden_states:
+            ax.add_patch(
+                patches.Rectangle(
+                    (s[0] - 0.5, s[1] - 0.5),
+                    1, 1, facecolor=self.color_forbid
+                )
+            )
+
+        # start
+        ax.plot(
+            self.start_state[0],
+            self.start_state[1],
+            marker="*",
+            color=self.color_agent,
+            markersize=15,
+            label="start"
+        )
+
+        # state values
+        if values is not None:
+            values = np.round(values, precision)
+            for i, v in enumerate(values):
+                x = i % self.env_size[0]
+                y = i // self.env_size[0]
+                ax.text(x, y, str(v), ha="center", va="center", fontsize=10)
+
+        # policy
+        if policy is not None:
+            for s, action_probs in enumerate(policy):
+                x = s % self.env_size[0]
+                y = s // self.env_size[0]
+                for a_idx, p in enumerate(action_probs):
+                    if p > 0:
+                        dx, dy = self.action_space[a_idx]
+                        if (dx, dy) != (0, 0):
+                            ax.arrow(
+                                x, y,
+                                0.3 * dx, 0.3 * dy,
+                                head_width=0.08,
+                                color=self.color_policy,
+                                length_includes_head=True
+                            )
+                        else:
+                            ax.add_patch(
+                                patches.Circle(
+                                    (x, y),
+                                    radius=0.1,
+                                    fill=False,
+                                    edgecolor=self.color_policy
+                                )
+                            )
+
+        plt.show()
 
     # Add policy visualization to the grid
     def add_policy(self, policy_matrix):                  
