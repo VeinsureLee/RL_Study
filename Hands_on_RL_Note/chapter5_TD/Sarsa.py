@@ -83,7 +83,7 @@ class Sarsa:
 def print_agent(agent, env, action_meaning, disaster=[], end=[]):
     """
     Print policy grid
-    :param agent: the reinforcement learning agent
+    :param agent: the reinforcement learning Note
     :param env: cliff walking environment
     :param action_meaning: action symbols ['^','v','<','>']
     :param disaster: state indices of dangerous area (cliff)
