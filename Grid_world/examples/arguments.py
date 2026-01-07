@@ -8,6 +8,20 @@ import argparse
 
 parser = argparse.ArgumentParser("Grid World Environment")
 
+
+## ==================== Forbidden area settings ====================
+forbidden_states = []
+# 添加 (i,1)，i从0到4（range(5) 是 0,1,2,3,4）
+forbidden_states.extend([(i, 1) for i in range(5)])
+# 添加 (1,j)，j从2到5（range(2,6) 是 2,3,4,5）
+forbidden_states.extend([(1, j) for j in range(2, 6)])
+# 添加 (i,3)，i从3到5（range(3,6) 是 3,4,5）
+forbidden_states.extend([(i, 3) for i in range(3, 5)])
+# 添加单独的禁止状态
+forbidden_states.extend([(5, 4), (3, 5)])
+## ==================== Forbidden area settings ====================
+
+
 ## ==================== User settings ===================='''
 # specify the number of columns and rows of the grid world
 parser.add_argument("--env-size", type=Union[list, tuple, np.ndarray], default=(7,7) )
@@ -19,15 +33,6 @@ parser.add_argument("--start-state", type=Union[list, tuple, np.ndarray], defaul
 parser.add_argument("--target-state", type=Union[list, tuple, np.ndarray], default=(4,4))
 
 # specify the forbidden states
-forbidden_states = []
-# 添加 (i,1)，i从0到4（range(5) 是 0,1,2,3,4）
-forbidden_states.extend([(i, 1) for i in range(5)])
-# 添加 (1,j)，j从2到5（range(2,6) 是 2,3,4,5）
-forbidden_states.extend([(1, j) for j in range(2, 6)])
-# 添加 (i,3)，i从3到5（range(3,6) 是 3,4,5）
-forbidden_states.extend([(i, 3) for i in range(3, 5)])
-# 添加单独的禁止状态
-forbidden_states.extend([(5, 4), (3, 5)])
 parser.add_argument("--forbidden-states", type=eval, default=forbidden_states )
 
 # specify the reward when reaching target
