@@ -132,8 +132,18 @@ class MonteCarloEpsilonGreedy:
             self.V[s_idx] = np.max(self.Q[s_idx])
         return self.V
 
+    def get_deterministic_policy(self):
+        deterministic_policy = np.zeros_like(self.policy)
+        for s_idx in range(self.num_states):
+            max_q = np.max(self.Q[s_idx])
+            best_actions = np.where(self.Q[s_idx] == max_q)[0]
+            # 随机选一个最优动作（如果有多个）
+            best_action = np.random.choice(best_actions)
+            deterministic_policy[s_idx, best_action] = 1.0  # 最优动作概率为1，其余为0
+        return deterministic_policy
+
     def render_static(self):
-        self.env.render_static(policy=self.get_policy(), values=self.get_V())
+        self.env.render_static(policy=self.get_deterministic_policy(), values=self.get_V())
 
 if __name__ == "__main__":
     env = GridWorld()
@@ -148,11 +158,9 @@ if __name__ == "__main__":
     s = env.start_state
     for t in range(agent.episode_length):
         env.render()
-        # 错误1修复：先将状态转为索引，再传入choose_action
         s_idx = agent.state2idx(s)
-        action_idx = agent.choose_action(s_idx)
-        # 错误2修复：直接用action_idx获取动作，无需np.argmax
-        action = agent.idx2action(action_idx)
+        best_action_idx = np.argmax(agent.Q[s_idx])
+        action = agent.idx2action(best_action_idx)
 
         next_state, reward, done, info = env.step(action)
         s = next_state
