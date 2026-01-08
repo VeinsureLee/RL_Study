@@ -80,7 +80,7 @@ class MonteCarloEpsilonGreedy:
         return episode
 
     def run(self):
-        for episode in tqdm(range(self.num_episodes), desc="Episodes"):
+        for episode in range(self.num_episodes):
             # 生成一个episode
             episode_data = self.generate_episode()
             G = 0
@@ -137,8 +137,25 @@ class MonteCarloEpsilonGreedy:
 
 if __name__ == "__main__":
     env = GridWorld()
-    agent = MonteCarloEpsilonGreedy(env, epsilon=0.2, gamma=1, num_episodes=100, episode_length=1000)
+    env.reward_step = 0
+    env.reward_target = 1000
+    agent = MonteCarloEpsilonGreedy(env, epsilon=0.2, gamma=0.99, num_episodes=5000, episode_length=1000)
     agent.run()
     print("Final Policy:")
     print(agent.get_policy())
     agent.render_static()
+    env.reset()
+    s = env.start_state
+    for t in range(agent.episode_length):
+        env.render()
+        # 错误1修复：先将状态转为索引，再传入choose_action
+        s_idx = agent.state2idx(s)
+        action_idx = agent.choose_action(s_idx)
+        # 错误2修复：直接用action_idx获取动作，无需np.argmax
+        action = agent.idx2action(action_idx)
+
+        next_state, reward, done, info = env.step(action)
+        s = next_state
+        if done:
+            print(f"Episode finished after {t + 1} steps")
+            break
