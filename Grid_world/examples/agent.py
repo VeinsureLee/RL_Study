@@ -49,24 +49,25 @@ class Agent:
             return np.random.choice(self.num_actions)
         else:
             max_value = np.max(self.policy[state_idx])
-            best_actions = np.where(self.policy[state_idx] == max_value)[0]  # 原代码错误使用policy，应该用Q值选最优动作
+            best_actions = np.where(self.policy[state_idx] == max_value)[0]
             return np.random.choice(best_actions)
 
     def generate_episode(self):
-        episode = []
+        episodes_list = []
         self.env.reset()
         s = self.env.start_state
         a_idx = self.choose_action(self.state2idx(s))
         a = self.idx2action(a_idx)
         for t in range(self.episode_length):
-            state, reward, done, info = self.env.step(a)
-            episode.append((s, a, reward))
+            next_state, reward, done, info = self.env.step(a)
             if done:
                 break
-            s = state  # 修复：忘记更新当前状态s
-            a_idx = self.choose_action(self.state2idx(s))
-            a = self.idx2action(a_idx)
-        return episode
+            a_next_idx = self.choose_action(self.state2idx(s))
+            a_next = self.idx2action(a_next_idx)
+            episodes_list.append((s, a, reward, next_state, a_next, done))
+            s = next_state
+            a = a_next
+        return episodes_list
 
     def run(self):
         for episode in range(self.num_episodes):

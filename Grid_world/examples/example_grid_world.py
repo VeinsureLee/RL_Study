@@ -3,11 +3,13 @@ sys.path.append("..")
 from src.grid_world import GridWorld
 import random
 import numpy as np
+import time
 
 # Example usage:
 if __name__ == "__main__":             
     env = GridWorld()
-    state = env.reset()               
+    state = env.reset()
+    start = time.time()
     for t in range(1000):
         # env.render()
         action = random.choice(env.action_space)
@@ -15,6 +17,8 @@ if __name__ == "__main__":
         print(f"Step: {t}, Action: {action}, State: {next_state+(np.array([1,1]))}, Reward: {reward}, Done: {done}")
         if done:
             break
+    end = time.time()
+    print(f"Time taken: {end-start}")
 
     # Add policy
     policy_matrix=np.random.rand(env.num_states,len(env.action_space))                                            
