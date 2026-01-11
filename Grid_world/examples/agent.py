@@ -125,8 +125,8 @@ class Agent:
     def get_deterministic_policy(self):
         deterministic_policy = np.zeros_like(self.policy)
         for s_idx in range(self.num_states):
-            max_q = np.max(self.Q[s_idx])
-            best_actions = np.where(self.Q[s_idx] == max_q)[0]
+            max_p = np.max(self.policy[s_idx])
+            best_actions = np.where(self.policy[s_idx] == max_p)[0]
             # 随机选一个最优动作（如果有多个）
             best_action = np.random.choice(best_actions)
             deterministic_policy[s_idx, best_action] = 1.0  # 最优动作概率为1，其余为0
