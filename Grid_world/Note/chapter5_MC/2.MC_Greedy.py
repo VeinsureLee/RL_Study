@@ -3,8 +3,17 @@ MonteCarlo epsilon_greedy
 Fixed policy update logic and state index mapping
 """
 import sys
-sys.argv = ['']
-sys.path.append("../..")
+import os
+sys.argv = ['']  # 避免 argparse 报错
+
+# 获取当前脚本所在目录的绝对路径
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# 获取 Grid_world 目录的路径（向上两级）
+grid_world_dir = os.path.join(current_dir, '..', '..')
+grid_world_dir = os.path.abspath(grid_world_dir)
+# 添加到 sys.path
+if grid_world_dir not in sys.path:
+    sys.path.insert(0, grid_world_dir)
 
 from src.grid_world import GridWorld
 import numpy as np
