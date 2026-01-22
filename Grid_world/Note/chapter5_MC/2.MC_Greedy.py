@@ -2,25 +2,19 @@
 MonteCarlo epsilon_greedy
 Fixed policy update logic and state index mapping
 """
+from tqdm import tqdm
+import random
+import numpy as np
+
 import sys
 import os
-sys.argv = ['']  # 避免 argparse 报错
 
-# 获取当前脚本所在目录的绝对路径
-current_dir = os.path.dirname(os.path.abspath(__file__))
-# 获取 Grid_world 目录的路径（向上两级）
-grid_world_dir = os.path.join(current_dir, '..', '..')
-grid_world_dir = os.path.abspath(grid_world_dir)
-# 添加到 sys.path
-if grid_world_dir not in sys.path:
-    sys.path.insert(0, grid_world_dir)
-
-from src.grid_world import GridWorld
-import numpy as np
-import random
-from tqdm import tqdm
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 # Monte Carlo Epsilon-Greedy Agent, a model free method
+from src.grid_world import GridWorld
+
+
 class MonteCarloEpsilonGreedy:
     def __init__(self, env, epsilon=0.1, gamma=0.9, num_episodes=5000, episode_length=100):
         # Environment parameters
@@ -38,7 +32,8 @@ class MonteCarloEpsilonGreedy:
         self.Q = np.zeros((self.num_states, self.num_actions))
         self.V = np.zeros(self.num_states)
         # 初始化均匀随机策略
-        self.policy = np.ones((self.num_states, self.num_actions)) / self.num_actions
+        self.policy = np.ones(
+            (self.num_states, self.num_actions)) / self.num_actions
 
         self.Return = np.zeros((self.num_states, self.num_actions))
         self.Number = np.zeros((self.num_states, self.num_actions))
@@ -69,7 +64,8 @@ class MonteCarloEpsilonGreedy:
             return np.random.choice(self.num_actions)
         else:
             max_value = np.max(self.policy[state_idx])
-            best_actions = np.where(self.policy[state_idx] == max_value)[0]  # 原代码错误使用policy，应该用Q值选最优动作
+            best_actions = np.where(self.policy[state_idx] == max_value)[
+                0]  # 原代码错误使用policy，应该用Q值选最优动作
             return np.random.choice(best_actions)
 
     def generate_episode(self):
@@ -83,7 +79,7 @@ class MonteCarloEpsilonGreedy:
             episode.append((s, a, reward))
             if done:
                 break
-            s = state  # 修复：忘记更新当前状态s
+            s = state
             a_idx = self.choose_action(self.state2idx(s))
             a = self.idx2action(a_idx)
         return episode
@@ -94,8 +90,6 @@ class MonteCarloEpsilonGreedy:
             episode_data = self.generate_episode()
             G = 0
             T = len(episode_data)
-            # 记录已经访问过的(state, action)对，实现首次访问型MC
-            visited = set()
 
             # 从后往前计算回报
             for t in range(T-1, -1, -1):
@@ -106,28 +100,28 @@ class MonteCarloEpsilonGreedy:
                 # 累计回报
                 G = self.gamma * G + r
 
-                # 首次访问型MC：只在第一次访问该(state, action)时更新
-                if (s_idx, a_idx) not in visited:
-                    visited.add((s_idx, a_idx))
-                    self.Return[s_idx, a_idx] += G
-                    self.Number[s_idx, a_idx] += 1
-                    # 策略评估：更新Q值
-                    self.Q[s_idx, a_idx] = self.Return[s_idx, a_idx] / self.Number[s_idx, a_idx]
+                self.Return[s_idx, a_idx] += G
+                self.Number[s_idx, a_idx] += 1
+                # 策略评估：更新Q值
+                self.Q[s_idx, a_idx] = self.Return[s_idx,
+                                                    a_idx] / self.Number[s_idx, a_idx]
 
-                    # 策略改进：正确的ε-贪心策略更新
-                    # 1. 找到当前状态下的最优动作
-                    max_q = np.max(self.Q[s_idx])
-                    best_actions = np.where(self.Q[s_idx] == max_q)[0]
-                    num_best_actions = len(best_actions)
+                # 策略改进：正确的ε-贪心策略更新
+                # 1. 找到当前状态下的最优动作
+                max_q = np.max(self.Q[s_idx])
+                best_actions = np.where(self.Q[s_idx] == max_q)[0]
+                num_best_actions = len(best_actions)
 
-                    # 2. 初始化策略概率
-                    self.policy[s_idx] = self.epsilon / self.num_actions  # 所有动作先分配ε/|A|
+                # 2. 初始化策略概率
+                self.policy[s_idx] = self.epsilon / \
+                    self.num_actions  # 所有动作先分配ε/|A|
 
-                    # 3. 给最优动作分配(1-ε)/|最优动作数|的概率
-                    for action_idx in best_actions:
-                        self.policy[s_idx, action_idx] += (1 - self.epsilon) / num_best_actions
+                # 3. 给最优动作分配(1-ε)/|最优动作数|的概率
+                for action_idx in best_actions:
+                    self.policy[s_idx,
+                                action_idx] += (1 - self.epsilon) / num_best_actions
 
-            if (episode + 1) % 10 == 0:  # 每10个episode打印一次，减少输出
+            if (episode + 1) % 100 == 0:  # 每100个episode打印一次，减少输出
                 print(f"Episode {episode + 1} completed.")
 
     def get_policy(self):
@@ -152,16 +146,15 @@ class MonteCarloEpsilonGreedy:
         return deterministic_policy
 
     def render_static(self):
-        self.env.render_static(policy=self.get_deterministic_policy(), values=self.get_V())
+        self.env.render_static(
+            policy=self.get_deterministic_policy(), values=self.get_V())
+
 
 if __name__ == "__main__":
     env = GridWorld()
-    env.reward_step = 0
-    env.reward_target = 1000
-    agent = MonteCarloEpsilonGreedy(env, epsilon=0.2, gamma=0.99, num_episodes=5000, episode_length=1000)
+    agent = MonteCarloEpsilonGreedy(
+        env, epsilon=0.2, gamma=0.99, num_episodes=5000, episode_length=1000)
     agent.run()
-    print("Final Policy:")
-    print(agent.get_policy())
     agent.render_static()
     env.reset()
     s = env.start_state
